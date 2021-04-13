@@ -4,35 +4,35 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from pandas.io.formats.format import return_docstring
+from get_data import get_data
+
+#inputs
+Monedas=['BTC','ETH','LTC']
+number_of_portfolios = 10000
+RiskFreeRate=0
 
 #Load  data
-Data = pd.read_csv(Path("Prices\Prices.csv"), index_col=0) 
+Data = get_data(Monedas)
+#Data = pd.read_csv(Path("Prices\Prices.csv"), index_col=0) 
 Data.sort_index(ascending=False, inplace=True)
 
 # calculate returns 
 Returns = Data.pct_change(-1)
-LogReturn =  np.log(1 + Data.pct_change(-1))
+LogReturns =  np.log(1 + Data.pct_change(-1))
 Returns.dropna(inplace= True)
 
-print(Returns.head())
-print(LogReturn.head())
 # Annualized Risk and Annualized mean returns by asset
 #-------------------------------------------------------------------------------------
-
-risk_returns_asset = (Returns.std() * np.sqrt(252)).to_frame()
-risk_returns_asset.columns = ['Risk']
+risk_asset = (Returns.std() * np.sqrt(252)).to_frame()
+risk_asset.columns = ['Risk']
 
 mean_returns_asset = (Returns.mean()*252).to_frame()
 mean_returns_asset.columns = ['Return']
 
-RiskReturn_asset = risk_returns_asset.join(mean_returns_asset, how='outer')
+RiskReturn_asset = risk_asset.join(mean_returns_asset, how='outer')
 #--------------------------------------------------------------------------------------------------------
 
-#Risk and return example weights
-
-#Define vars
-number_of_portfolios = 1000
-RiskFreeRate=0
+#Portfolio Risk/return 
 
 portfolio_returns = []
 portfolio_risk = []
@@ -43,7 +43,7 @@ portfolio_weights = []
 for portfolio in range (number_of_portfolios):
 
     #Random Weight
-    weights = np.random.random_sample(len(risk_returns_asset.index))
+    weights = np.random.random_sample(len(Monedas))
     weights = weights / np.sum(weights)
     portfolio_weights.append(weights)
 
@@ -61,7 +61,6 @@ for portfolio in range (number_of_portfolios):
     sharpe_ratio = ((portfolio_mean_return- RiskFreeRate)/port_standard_deviation)
     portfolio_sharpe_ratio.append(sharpe_ratio)
   
-
 #convert to arrays
 portfolio_risk = np.array(portfolio_risk)
 portfolio_returns = np.array(portfolio_returns)
@@ -71,36 +70,34 @@ porfolio_metrics = [portfolio_returns,portfolio_risk,sharpe_ratio_port, portfoli
 #from Python list we create a Pandas DataFrame
 portfolio_dfs = pd.DataFrame(porfolio_metrics)
 portfolio_dfs = portfolio_dfs.T
+
 #Rename the columns:
 portfolio_dfs.columns = ['Port Returns','Port Risk','Sharpe Ratio','Portfolio Weights']
 
 Max_risk = portfolio_dfs['Port Risk'].max()
 min_risk = portfolio_dfs['Port Risk'].min()
-print(Max_risk)
-print(min_risk)
+
 #range_of_risk = range(min_risk,Max_risk,)
 
 #convert from object to float the first three columns.
 for col in ['Port Returns', 'Port Risk', 'Sharpe Ratio']:
     portfolio_dfs[col] = portfolio_dfs[col].astype(float)
-portfolio_dfs
 
-portfolio_dfs.to_csv(Path("dfs.csv"))
+
+#portfolio_dfs.to_csv(Path("output.csv"))
 
 index_max_SharpeRatio=portfolio_dfs['Sharpe Ratio'].argmax()
 MaxSharpeRatioReturn=portfolio_dfs.iloc[index_max_SharpeRatio,0]
 MaxSharpeRatioRisk=portfolio_dfs.iloc[index_max_SharpeRatio,1]
 
-
-
-
 print("Max Sharpe ratio is: {}".format(portfolio_dfs['Sharpe Ratio'].max()))
-print("Return of Max Sharpe ratio: {}".format(MaxSharpeRatioReturn))
-print("Risk of Max Sharpe ratio: {}".format(MaxSharpeRatioRisk))
+print("Return of Max Sharpe ratio portfolio: {}".format(MaxSharpeRatioReturn))
+print("Risk of Max Sharpe ratio portfolio: {}".format(MaxSharpeRatioRisk))
 print("Max Sharpe ratio: {}".format(portfolio_dfs.iloc[index_max_SharpeRatio,2]))
-print("pesos: {}".format(portfolio_dfs.iloc[index_max_SharpeRatio,3]))
+print("Max Sharpe weight: {}".format(portfolio_dfs.iloc[index_max_SharpeRatio,3]))
 
-#Graficos
+
+#Graphs
 
 #Risk/Retun portfolio assets
 fig, ax = plt.subplots()
