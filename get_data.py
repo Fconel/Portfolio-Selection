@@ -1,13 +1,15 @@
+import pathlib
 import pandas as pd
+from pathlib import Path
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-#Load all data
-def get_data(names):
+#Load data from WEB OR CSV
+def DataFromWeb(names:list) -> pd.DataFrame:
     
     data = pd.DataFrame()
-  
+
     for _ in range(len(names)):
         
         #Load data from cryptodatadownload.com
@@ -25,5 +27,11 @@ def get_data(names):
         #Merge data, drop NAN rows and save csv
         data = data.join(data_price, how='outer')
         data.dropna(inplace= True)
+
+    return data
+
+def DataFromCSV(Path: pathlib.Path) -> pd.DataFrame:
+            
+    data = pd.read_csv(Path, index_col=0) 
 
     return data
