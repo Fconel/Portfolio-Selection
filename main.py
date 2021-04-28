@@ -1,7 +1,8 @@
 import optimization
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
-#parametros
+
+#Parametros
 Monedas=['BTC','ETH','LTC']
 number_of_portfolios = 10000
 RiskFreeRate=0
