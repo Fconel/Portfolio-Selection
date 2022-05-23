@@ -1,0 +1,6 @@
+*.xlsx
+*.xls
+test.py
+__pycache__/
+Prices/
+.env
