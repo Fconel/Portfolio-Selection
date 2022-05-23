@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import ssl
 
-def pricesDataFromWeb(symbol:list,sourceURL:str='https://www.cryptodatadownload.com/cdd/',
+def web_prices(symbol:list,sourceURL:str='https://www.cryptodatadownload.com/cdd/',
 exchange:str='Binance',pair:str='USDT',periodicity:str='d',number_observations:int=360) -> pd.DataFrame:
     """
     Check https://www.cryptodatadownload.com/data/ for avaible exchanges ,periodicity, and pairs
@@ -34,7 +34,7 @@ def rate_of_return(prices: pd.DataFrame,LogReturn=False) -> pd.DataFrame:
     else:
         return prices.pct_change(-1).dropna()
 
-def RiskByAsset(Returns:pd.DataFrame)-> pd.DataFrame:
+def risk_by_asset(Returns:pd.DataFrame)-> pd.DataFrame:
 
     risk_asset = (Returns.std() * np.sqrt(252)).to_frame()
     risk_asset.columns = ['Risk']
@@ -44,7 +44,7 @@ def RiskByAsset(Returns:pd.DataFrame)-> pd.DataFrame:
 
     return risk_asset.join(mean_returns_asset, how='outer')
 
-def EfficientFrontier(Returns,N_simulations,RiskFreeRate,save_simulatios=True):
+def efficient_frontier(returns,N_simulations,RiskFreeRate,save_simulatios=True):
     
     portfolio_risk_return=[]
     portfolio_metrics={'portfolio_returns': 0, 'portfolio_risk': 0, 'portfolio_sharpe_ratio': -99,'portfolio_weights':[],'portfolio_risk_return':[]}
@@ -52,14 +52,14 @@ def EfficientFrontier(Returns,N_simulations,RiskFreeRate,save_simulatios=True):
     for portfolio in range (N_simulations):
         
         #Random Weight
-        weights = np.random.random_sample(len(Returns.columns))
+        weights = np.random.random_sample(len(returns.columns))
         weights = weights / np.sum(weights)
         
         #Calculate Return
-        portfolio_mean_return= sum(Returns.mean()*weights)*252
+        portfolio_mean_return= sum(returns.mean()*weights)*252
         
         #Calculate Risk
-        cov_matrix = (Returns.cov())*252
+        cov_matrix = (returns.cov())*252
         port_variance = (weights.T).dot(cov_matrix.dot(weights))
         port_standard_deviation = np.sqrt(port_variance)
      
@@ -80,9 +80,9 @@ def EfficientFrontier(Returns,N_simulations,RiskFreeRate,save_simulatios=True):
     
     return portfolio_metrics
 
-class graficos():
+class graphs():
 
-    def Risk_Retun(RiskReturn_asset):
+    def risk_retun(RiskReturn_asset):
         fig, ax = plt.subplots()
         ax.yaxis.set_major_formatter(FuncFormatter('{0:.0%}'.format))
         ax.xaxis.set_major_formatter(FuncFormatter('{0:.0%}'.format))

@@ -1,22 +1,22 @@
-from util import RiskByAsset,EfficientFrontier,graficos,pricesDataFromWeb,rate_of_return
+from util import risk_by_asset,efficient_frontier,graphs,web_prices,rate_of_return
 
 def main():
     #Params
-    tickers=['BTC','ETH','LTC']
-    number_of_simulations = 10000
-    RiskFreeRate=0
+    TICKERS=['BTC','ETH','LTC']
+    NUMBER_OF_SIMULATIONS = 10000
+    RISK_FREE_RATE=0
 
     #Get prices and calc return
-    prices = pricesDataFromWeb(tickers,number_observations=720)
-    Returns = rate_of_return(prices,LogReturn=True)
+    prices = web_prices(TICKERS,number_observations=720)
+    returns = rate_of_return(prices,LogReturn=True)
 
     #Efficient portfolio calc
-    RiskReturn_asset = RiskByAsset(Returns)
-    EfficientPortfolio=EfficientFrontier(Returns,number_of_simulations,RiskFreeRate)
+    risk_return_by_asset = risk_by_asset(returns)
+    efficient_portfolio=efficient_frontier(returns,NUMBER_OF_SIMULATIONS,RISK_FREE_RATE)
 
     #Graphs
-    graficos.Risk_Retun(RiskReturn_asset)
-    graficos.portfolio_simulation(EfficientPortfolio)
+    graphs.risk_retun(risk_return_by_asset)
+    graphs.portfolio_simulation(efficient_portfolio)
     
 if __name__ == '__main__':
     main()
